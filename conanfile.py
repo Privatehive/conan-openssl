@@ -211,6 +211,11 @@ class OpenSSLConan(ConanFile):
 
         return target
 
+    def _patch_config(self):
+        if self.settings.os == "Android":
+            configFile = os.path.join(self.subfolder, "Configurations/10-main.conf")
+            tools.replace_in_file(configFile, "# about JNI, i.e. shared libraries, not applications.", 'shared_extension => ".so",')
+
     def _patch_makefile(self):
         if self.settings.os == "Macos":
             self._patch_install_name()
@@ -229,6 +234,8 @@ class OpenSSLConan(ConanFile):
     def unix_build(self):
         win_bash = self.settings.os == "Windows" or self.settings.os_build == "Windows"
         target = self._get_target()
+
+        self._patch_config()
 
         self.run_in_src("./Configure %s %s" % (target, self._get_flags()), win_bash=win_bash)
 
@@ -324,12 +331,8 @@ class OpenSSLConan(ConanFile):
             if self.options.shared:
                 self.copy(pattern="*libcrypto*.dylib", dst="lib", keep_path=False)
                 self.copy(pattern="*libssl*.dylib", dst="lib", keep_path=False)
-                if self.settings.os_build == "Windows":
-                    self.copy(pattern="*libcrypto.so", dst="lib", keep_path=False)
-                    self.copy(pattern="*libssl.so", dst="lib", keep_path=False)
-                else:
-                    self.copy(pattern="*libcrypto.so*", dst="lib", keep_path=False)
-                    self.copy(pattern="*libssl.so*", dst="lib", keep_path=False)
+                self.copy(pattern="*libcrypto.so*", dst="lib", keep_path=False)
+                self.copy(pattern="*libssl.so*", dst="lib", keep_path=False)
             else:
                 self.copy("*.a", "lib", keep_path=False)
 
