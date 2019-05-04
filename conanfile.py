@@ -1,13 +1,13 @@
 from conans import ConanFile, AutoToolsBuildEnvironment
 from conans import tools
 import os
-import subprocess
+import sys
 
 
 class OpenSSLConan(ConanFile):
     name = "OpenSSL"
-    version = "1.1.0g"
-    settings = "os", "compiler", "arch", "build_type", "os_build"
+    version = "1.1.1b"
+    settings = "os", "compiler", "arch", "build_type"
     url = "http://github.com/lasote/conan-openssl"
     license = "The current OpenSSL licence is an 'Apache style' license: https://www.openssl.org/source/license.html"
     description = "OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured " \
@@ -41,14 +41,13 @@ class OpenSSLConan(ConanFile):
     source_tgz_old = "https://www.openssl.org/source/old/1.1.0/openssl-%s.tar.gz" % version
 
     def build_requirements(self):
-        # useful for example for conditional build_requires
         if self.compiler == "Visual Studio":
             self.build_requires("strawberryperl/5.26.0@conan/stable")
             if not self.options.no_asm:
                 self.build_requires("nasm/2.13.01@conan/stable")
         if self.settings.os == 'Android':
-            self.build_requires_options['android-ndk'].makeStandalone = True
-            if self.settings.os_build == 'Windows':
+            self.build_requires_options['android-ndk']
+            if tools.os_info.is_windows:
                 self.build_requires("msys2/20161025@tereius/stable")
             self.build_requires("android-ndk/r17b@tereius/stable")
 
@@ -60,15 +59,11 @@ class OpenSSLConan(ConanFile):
             tools.download(self.source_tgz, "openssl.tar.gz")
         tools.unzip("openssl.tar.gz")
         tools.check_sha256("openssl.tar.gz",
-                           "de4d501267da39310905cb6dc8c6121f7a2cad45a7707f76df828fe1b85073af")
+                           "5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b")
         os.unlink("openssl.tar.gz")
 
     def configure(self):
         del self.settings.compiler.libcxx
-        if self.settings.os == 'Android' and self.settings.os_build == 'Windows':
-            self.options["msys2"].provideMinGW = False
-            self.options.no_zlib = True
-            self.options.no_asm = True
 
     def requirements(self):
         if not self.options.no_zlib:
@@ -103,13 +98,13 @@ class OpenSSLConan(ConanFile):
             # pipe doesn't fail if first part fails
             command = 'bash -l -c -o pipefail "%s"' % command.replace('"', '\\"')
         with tools.chdir(self.subfolder):
-            #self.output.write("------RUNNING-------\n%s" % command)
-            #if self.settings.compiler == "clang":  # Output ruin travis builds
-            #    from six import StringIO
-            #    buf = StringIO()
-            #else:
-            #    buf = True
-            self.run(command, win_bash=win_bash)
+            self.output.write("------RUNNING-------\n%s" % command)
+            if self.settings.compiler == "clang" and "TRAVIS" in os.environ:  # Output ruin travis builds
+                from six import StringIO
+                buf = StringIO()
+            else:
+                buf = True
+            self.run(command, win_bash=win_bash, output=buf)
         self.output.writeln(" ")
 
     def _get_config_options_string(self):
@@ -149,6 +144,10 @@ class OpenSSLConan(ConanFile):
             extra_flags = "--debug" if self.settings.build_type == "Debug" else "--release"
             extra_flags += " no-shared" if not self.options.shared else " shared"
 
+        if self.settings.os == "Android":
+            # see NOTES.ANDROID
+            extra_flags += " -D__ANDROID_API__=%s" % str(self.settings.os.api_level)
+
         extra_flags += self._get_config_options_string()
         return extra_flags
 
@@ -175,12 +174,13 @@ class OpenSSLConan(ConanFile):
             target = {"x86": "darwin-i386-cc",
                       "x86_64": "darwin64-x86_64-cc"}.get(str(self.arch))
         elif self.settings.os == "Android":
-            target = {"armv7": "android-armeabi",
-                      "armv7hf": "android-armeabi",
-                      "armv8": "android64-aarch64",
+            target = {"armv7": "android-arm",
+                      "armv7hf": "android-arm",
+                      "armv8": "android-arm64",
                       "x86": "android-x86",
-                      "x86_64": "android64",
-                      "mips": "android-mips"}.get(str(self.arch), None)
+                      "x86_64": "android-x86_64",
+                      "mips": "android-mips",
+                      "mips64": "android-mips64"}.get(str(self.arch), None)
             if not target:
                 raise Exception("Unsupported arch for android")
         elif self.settings.os == "SunOS":
@@ -211,41 +211,32 @@ class OpenSSLConan(ConanFile):
 
         return target
 
-    def _patch_config(self):
-        if self.settings.os == "Android":
-            configFile = os.path.join(self.subfolder, "Configurations/10-main.conf")
-            tools.replace_in_file(configFile, "# about JNI, i.e. shared libraries, not applications.", 'shared_extension => ".so",')
-
     def _patch_makefile(self):
         if self.settings.os == "Macos":
             self._patch_install_name()
         if self.settings.os == "Android":
             makefile = os.path.join(self.subfolder, "Makefile")
-            tools.replace_in_file(makefile, "--sysroot=$(CROSS_SYSROOT)", "")
-            if self.settings.compiler == "clang":
-                tools.replace_in_file(makefile, "-mandroid", "", strict=self.in_local_cache)
-
-    @property
-    def _make_program(self):
-        make_program = tools.get_env("CONAN_MAKE_PROGRAM", tools.which("make") or tools.which('mingw32-make'))
-        make_program = tools.unix_path(make_program) if (self.settings.os == "Windows" or self.settings.os_build == "Windows") else make_program
-        return make_program
 
     def unix_build(self):
-        win_bash = self.settings.os == "Windows" or self.settings.os_build == "Windows"
+        win_bash = self.settings.os == "Windows" or tools.os_info.is_windows
         target = self._get_target()
 
-        self._patch_config()
+        config_options_string = self._get_flags()
+        if self.settings.os == "Android":
+            config_options_string += ' CC="%s"' % self.compiler
+            config_options_string += ' AR="ar"'
+        command = "./Configure %s %s" % (target, config_options_string)
 
-        self.run_in_src("./Configure %s %s" % (target, self._get_flags()), win_bash=win_bash)
+        self.run_in_src(command, win_bash=win_bash)
+        self.run_in_src("make depend")
 
         self._patch_makefile()
 
         self.output.warn("----------MAKE OPENSSL %s-------------" % self.version)
-        self.run_in_src(self._make_program, win_bash=win_bash)
+        self.run_in_src("make", show_output=True, win_bash=win_bash)
 
     def ios_build(self):
-        config_options_string = self._get_config_options_string()
+        config_options_string = self._get_flags()
         command = "./Configure iphoneos-cross %s" % config_options_string
 
         xcrun = tools.XCRun(self.settings)
@@ -255,6 +246,14 @@ class OpenSSLConan(ConanFile):
         if not str(self.arch).startswith("arm"):
             cc += " -DOPENSSL_NO_ASM"
 
+        try:
+            cc += " -mios-version-min=%s" % self.settings.os.version
+            self.output.info("iOS deployment target: %s" % self.settings.os.version)
+        except:
+            pass
+
+        cc += " -fembed-bitcode"
+
         os.environ["CROSS_SDK"] = os.path.basename(xcrun.sdk_path)
         os.environ["CROSS_TOP"] = os.path.dirname(os.path.dirname(xcrun.sdk_path))
 
@@ -263,12 +262,12 @@ class OpenSSLConan(ConanFile):
         self.run_in_src(command)
         self._patch_install_name()
         self.output.warn("----------MAKE OPENSSL %s-------------" % self.version)
-        self.run_in_src(self._make_program)
+        self.run_in_src("make")
 
     def _patch_install_name(self):
-        old_str = '-install_name $(INSTALLTOP)/$(LIBDIR)/$(SHLIBNAME_FULL)'
-        new_str = '-install_name $(SHLIBNAME_FULL)'
-        tools.replace_in_file("%s/Makefile.shared" % self.subfolder, old_str, new_str,
+        old_str = '-install_name $(INSTALLTOP)/$(LIBDIR)/'
+        new_str = '-install_name '
+        tools.replace_in_file("%s/Makefile" % self.subfolder, old_str, new_str,
                               strict=self.in_local_cache)
 
     def _patch_runtime(self):
@@ -317,6 +316,10 @@ class OpenSSLConan(ConanFile):
             self.copy(pattern="*.lib", dst="lib", keep_path=False)
             self.copy(pattern="*.dll", dst="bin", keep_path=False)
             self.copy(pattern="*.h", dst="include/openssl/", src="binaries/include/", keep_path=False)
+            if self.settings.build_type == 'Debug':
+                with tools.chdir(os.path.join(self.package_folder, 'lib')):
+                    os.rename('libssl.lib', 'libssld.lib')
+                    os.rename('libcrypto.lib', 'libcryptod.lib')
         elif self.settings.os == "Windows" and self.compiler == "gcc":
             self.copy(src=self.subfolder, pattern="include/*", dst="include/openssl/", keep_path=False)
             if self.options.shared:
@@ -331,8 +334,8 @@ class OpenSSLConan(ConanFile):
             if self.options.shared:
                 self.copy(pattern="*libcrypto*.dylib", dst="lib", keep_path=False)
                 self.copy(pattern="*libssl*.dylib", dst="lib", keep_path=False)
-                self.copy(pattern="*libcrypto.so*", dst="lib", keep_path=False)
-                self.copy(pattern="*libssl.so*", dst="lib", keep_path=False)
+                self.copy(pattern="*libcrypto.so*", dst="lib", keep_path=False, symlinks=True)
+                self.copy(pattern="*libssl.so*", dst="lib", keep_path=False, symlinks=True)
             else:
                 self.copy("*.a", "lib", keep_path=False)
 
@@ -343,10 +346,13 @@ class OpenSSLConan(ConanFile):
 
     def package_info(self):
         if self.compiler == "Visual Studio":
-            self.cpp_info.libs = ["libssl", "libcrypto", "crypt32", "msi", "ws2_32"]
+            self.cpp_info.libs = ['libssld', 'libcryptod'] if self.settings.build_type == 'Debug' else \
+                ['libssl', 'libcrypto']
         elif self.compiler == "gcc" and self.settings.os == "Windows":
-            self.cpp_info.libs = ["ssl", "crypto",  "crypt32", "ws2_32"]
+            self.cpp_info.libs = ["ssl", "crypto"]
         elif self.settings.os == "Linux":
             self.cpp_info.libs = ["ssl", "crypto", "dl", "pthread"]
         else:
             self.cpp_info.libs = ["ssl", "crypto"]
+        if self.settings.os == "Windows":
+            self.cpp_info.libs.extend(["crypt32", "msi", "ws2_32", "advapi32", "user32"])
