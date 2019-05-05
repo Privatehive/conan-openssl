@@ -1,5 +1,11 @@
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: Tereius/conan-azure-templates
+
 jobs:
-- job:
+- job: Android
   strategy:
     matrix:
       Linux:
@@ -30,7 +36,7 @@ jobs:
       CONAN_USERNAME: "tereius",
       CONAN_CHANNEL: "stable",
       CONAN_REMOTES: "https://api.bintray.com/conan/tereius/public-conan",
-      CONAN_UPLOAD: "https://api.bintray.com/conan/tereius/public-conan",
+      #CONAN_UPLOAD: "https://api.bintray.com/conan/tereius/public-conan",
       CONAN_LOGIN_USERNAME: "tereius",
       CONAN_PASSWORD: "$(secret)",
       CONAN_BASE_PROFILE_OS: "Android",
@@ -46,7 +52,7 @@ jobs:
     
 - job: iOS
   pool:
-    vmImage: 'macOS-10.14'
+    vmImage: "macOS-10.14"
   timeoutInMinutes: 30
   steps:
   - task: UsePythonVersion@0
@@ -67,7 +73,7 @@ jobs:
       CONAN_USERNAME: "tereius",
       CONAN_CHANNEL: "stable",
       CONAN_REMOTES: "https://api.bintray.com/conan/tereius/public-conan",
-      CONAN_UPLOAD: "https://api.bintray.com/conan/tereius/public-conan",
+      #CONAN_UPLOAD: "https://api.bintray.com/conan/tereius/public-conan",
       CONAN_LOGIN_USERNAME: "tereius",
       CONAN_PASSWORD: "$(secret)",
       CONAN_BASE_PROFILE_OS: "iOS",
@@ -81,3 +87,20 @@ jobs:
       CONAN_OPTIONS: "no_zlib=True,no_asm=True,shared=True"
     }
     
+- job: Upload recipe
+    dependsOn:
+    - Android
+    - iOS
+    condition: succeeded()
+    pool:
+      vmImage: "ubuntu-16.04"
+    steps:
+    - template: uploadConanRecipe.yml@templates
+      parameters: 
+        additionalEnv: {
+          CONAN_USERNAME: "tereius",
+          CONAN_CHANNEL: "stable",
+          CONAN_UPLOAD: "https://api.bintray.com/conan/tereius/public-conan",
+          CONAN_LOGIN_USERNAME: "tereius",
+          CONAN_PASSWORD: "$(secret)",
+        }
