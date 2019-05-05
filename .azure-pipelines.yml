@@ -22,6 +22,8 @@ jobs:
   - template: buildConanRecipe.yml@templates
     parameters: 
       conanEnv: {
+        CONAN_USERNAME: "tereius",
+        CONAN_CHANNEL: "stable",
         CONAN_REMOTES: "https://api.bintray.com/conan/tereius/public-conan",
         CONAN_BASE_PROFILE_OS: "Android",
         CONAN_BASE_PROFILE_OS_API: "21",
@@ -42,6 +44,8 @@ jobs:
   - template: buildConanRecipe.yml@templates
     parameters:
       conanEnv: {
+        CONAN_USERNAME: "tereius",
+        CONAN_CHANNEL: "stable",
         CONAN_REMOTES: "https://api.bintray.com/conan/tereius/public-conan",
         CONAN_BASE_PROFILE_OS: "iOS",
         CONAN_BASE_PROFILE_OS_VERSION: "12.0",
