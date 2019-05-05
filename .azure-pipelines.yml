@@ -41,10 +41,10 @@ jobs:
       CONAN_BASE_PROFILE_COMPILER: "clang",
       CONAN_BASE_PROFILE_COMPILER_VERSION: "6.0",
       CONAN_BASE_PROFILE_COMPILER_LIBCXX: "libc++",
-      CONAN_OPTIONS: "no_zlib=True, no_asm=True, shared=True"
+      CONAN_OPTIONS: "no_zlib=True,no_asm=True,shared=True"
     }
     
-- job:
+- job: iOS
   pool:
     vmImage: 'macOS-10.14'
   timeoutInMinutes: 30
@@ -78,6 +78,6 @@ jobs:
       CONAN_BASE_PROFILE_COMPILER: "apple-clang",
       CONAN_BASE_PROFILE_COMPILER_VERSION: "10.0",
       CONAN_BASE_PROFILE_COMPILER_LIBCXX: "libc++",
-      CONAN_OPTIONS: "no_zlib=True, no_asm=True, shared=True"
+      CONAN_OPTIONS: "no_zlib=True,no_asm=True,shared=True"
     }
     
