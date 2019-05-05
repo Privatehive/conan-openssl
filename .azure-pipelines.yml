@@ -20,7 +20,6 @@ jobs:
   timeoutInMinutes: 30
   steps:
   - template: buildConanRecipe.yml@templates
-    displayName: 'Run build'
     parameters: 
       conanEnv: {
         CONAN_REMOTES: "https://api.bintray.com/conan/tereius/public-conan",
@@ -41,7 +40,6 @@ jobs:
   timeoutInMinutes: 30
   steps:
   - template: buildConanRecipe.yml@templates
-    displayName: 'Run build'
     parameters:
       conanEnv: {
         CONAN_REMOTES: "https://api.bintray.com/conan/tereius/public-conan",
@@ -65,7 +63,6 @@ jobs:
     vmImage: "ubuntu-16.04"
   steps:
   - template: uploadConanRecipe.yml@templates
-    displayName: 'Upload recipe'
     parameters: 
       conanEnv: {
         CONAN_USERNAME: "tereius",
