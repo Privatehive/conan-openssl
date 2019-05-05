@@ -88,19 +88,19 @@ jobs:
     }
     
 - job: Upload recipe
-    dependsOn:
-    - Android
-    - iOS
-    condition: succeeded()
-    pool:
-      vmImage: "ubuntu-16.04"
-    steps:
-    - template: uploadConanRecipe.yml@templates
-      parameters: 
-        additionalEnv: {
-          CONAN_USERNAME: "tereius",
-          CONAN_CHANNEL: "stable",
-          CONAN_UPLOAD: "https://api.bintray.com/conan/tereius/public-conan",
-          CONAN_LOGIN_USERNAME: "tereius",
-          CONAN_PASSWORD: "$(secret)",
-        }
+  dependsOn:
+  - Android
+  - iOS
+  condition: succeeded()
+  pool:
+    vmImage: "ubuntu-16.04"
+  steps:
+  - template: uploadConanRecipe.yml@templates
+    parameters: 
+      additionalEnv: {
+        CONAN_USERNAME: "tereius",
+        CONAN_CHANNEL: "stable",
+        CONAN_UPLOAD: "https://api.bintray.com/conan/tereius/public-conan",
+        CONAN_LOGIN_USERNAME: "tereius",
+        CONAN_PASSWORD: "$(secret)",
+      }
