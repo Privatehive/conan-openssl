@@ -11,6 +11,9 @@ if __name__ == "__main__":
 
     if 'CONAN_BASE_PROFILE_OS_API' in os.environ:
         os.system("conan profile update settings.os.api_level=\"%s\" ./ci-profile" % os.environ['CONAN_BASE_PROFILE_OS_API'])
+        
+    if 'CONAN_BASE_PROFILE_OS_VERSION' in os.environ:
+        os.system("conan profile update settings.os.version=\"%s\" ./ci-profile" % os.environ['CONAN_BASE_PROFILE_OS_VERSION'])
 
     if 'CONAN_BASE_PROFILE_OSBUILD' in os.environ:
         os.system("conan profile update settings.os_build=\"%s\" ./ci-profile" % os.environ['CONAN_BASE_PROFILE_OSBUILD'])

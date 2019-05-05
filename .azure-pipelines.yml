@@ -8,9 +8,6 @@ jobs:
       Windows:
         imageName: "windows-2019"
         conanBuildOS: "Windows"
-      Macos:
-        imageName: "macOS-10.14"
-        conanBuildOS: "Macos"
   pool:
     vmImage: '$(imageName)'
   timeoutInMinutes: 30
@@ -46,3 +43,41 @@ jobs:
       CONAN_BASE_PROFILE_COMPILER_LIBCXX: "libc++",
       CONAN_OPTIONS: "no_zlib=True, no_asm=True, shared=True"
     }
+    
+- job:
+  pool:
+    vmImage: 'macOS-10.14'
+  timeoutInMinutes: 30
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: "3.x"
+      addToPath: true
+      architecture: "x64"
+
+  - script: |
+      pip install conan
+      pip install conan_package_tools
+      conan user
+    displayName: 'Install conan'
+
+  - script: python build.py
+    displayName: 'Run build'
+    env: {
+      CONAN_USERNAME: "tereius",
+      CONAN_CHANNEL: "stable",
+      CONAN_REMOTES: "https://api.bintray.com/conan/tereius/public-conan",
+      CONAN_UPLOAD: "https://api.bintray.com/conan/tereius/public-conan",
+      CONAN_LOGIN_USERNAME: "tereius",
+      CONAN_PASSWORD: "$(secret)",
+      CONAN_BASE_PROFILE_OS: "iOS",
+      CONAN_BASE_PROFILE_OS_VERSION: "12.0",
+      CONAN_BASE_PROFILE_ARCH: "armv8",
+      CONAN_BASE_PROFILE_OSBUILD: "Macos",
+      CONAN_BASE_PROFILE_ARCHBUILD: "x86_64",
+      CONAN_BASE_PROFILE_COMPILER: "apple-clang",
+      CONAN_BASE_PROFILE_COMPILER_VERSION: "10.0",
+      CONAN_BASE_PROFILE_COMPILER_LIBCXX: "libc++",
+      CONAN_OPTIONS: "no_zlib=True, no_asm=True, shared=True"
+    }
+    
