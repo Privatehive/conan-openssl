@@ -225,6 +225,7 @@ class OpenSSLConan(ConanFile):
         if self.settings.os == "Android":
             config_options_string += ' CC="%s"' % self.compiler
             config_options_string += ' AR="ar"'
+            self._patch_android_config()
         command = "./Configure %s %s" % (target, config_options_string)
 
         self.run_in_src(command, win_bash=win_bash)
@@ -263,6 +264,9 @@ class OpenSSLConan(ConanFile):
         self._patch_install_name()
         self.output.warn("----------MAKE OPENSSL %s-------------" % self.version)
         self.run_in_src("make")
+
+    def _patch_android_config(self):
+        tools.replace_in_file("%s/Configurations/15-android.conf" % self.subfolder, 'die "no NDK $triarch-$cc on \$PATH";', "")  
 
     def _patch_install_name(self):
         old_str = '-install_name $(INSTALLTOP)/$(LIBDIR)/'
