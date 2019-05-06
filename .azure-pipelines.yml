@@ -75,7 +75,7 @@ jobs:
         CONAN_BASE_PROFILE_ARCHBUILD: "x86_64",
         CONAN_BASE_PROFILE_COMPILER: "gcc",
         CONAN_BASE_PROFILE_COMPILER_VERSION: "5",
-        CONAN_BASE_PROFILE_COMPILER_LIBCXX: "libstd++11",
+        CONAN_BASE_PROFILE_COMPILER_LIBCXX: "libstdc++",
         CONAN_OPTIONS: "no_zlib=True,no_asm=True,shared=True"
       }
       
