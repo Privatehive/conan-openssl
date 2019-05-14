@@ -266,7 +266,8 @@ class OpenSSLConan(ConanFile):
         self.run_in_src("make")
 
     def _patch_android_config(self):
-        tools.replace_in_file("%s/Configurations/15-android.conf" % self.subfolder, 'die "no NDK $triarch-$cc on \$PATH";', "")  
+        tools.replace_in_file("%s/Configurations/15-android.conf" % self.subfolder, 'die "no NDK $triarch-$cc on \$PATH";', "")
+        tools.replace_in_file("%s/Configurations/15-android.conf" % self.subfolder, "# about JNI, i.e. shared libraries, not applications.", 'shared_extension => ".so",')
 
     def _patch_install_name(self):
         old_str = '-install_name $(INSTALLTOP)/$(LIBDIR)/'
