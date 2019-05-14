@@ -46,7 +46,7 @@ class OpenSSLConan(ConanFile):
             if not self.options.no_asm:
                 self.build_requires("nasm/2.13.01@conan/stable")
         if self.settings.os == 'Android':
-            self.build_requires_options['android-ndk']
+            self.build_requires_options['android-ndk'].makeStandalone = True
             if tools.os_info.is_windows:
                 self.build_requires("msys2/20161025@tereius/stable")
             self.build_requires("android-ndk/r17b@tereius/stable")
