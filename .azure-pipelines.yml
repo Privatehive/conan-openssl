@@ -120,6 +120,27 @@ jobs:
         CONAN_BASE_PROFILE_COMPILER_LIBCXX: "libc++",
         CONAN_OPTIONS: "no_zlib=True,no_asm=True,shared=True"
       }
+      
+- job: Emscripten
+  pool:
+    vmImage: "ubuntu-16.04"
+  timeoutInMinutes: 30
+  steps:
+  - template: buildConanRecipe.yml@templates
+    parameters:
+      conanEnv: {
+        CONAN_USERNAME: "tereius",
+        CONAN_CHANNEL: "stable",
+        CONAN_REMOTES: "https://api.bintray.com/conan/tereius/public-conan,https://api.bintray.com/conan/bincrafters/public-conan",
+        CONAN_BASE_PROFILE_OS: "Emscripten",
+        CONAN_BASE_PROFILE_ARCH: "asm.js",
+        CONAN_BASE_PROFILE_OSBUILD: "Linux",
+        CONAN_BASE_PROFILE_ARCHBUILD: "x86_64",
+        CONAN_BASE_PROFILE_COMPILER: "clang",
+        CONAN_BASE_PROFILE_COMPILER_VERSION: "6.0",
+        CONAN_BASE_PROFILE_COMPILER_LIBCXX: "libc++",
+        CONAN_OPTIONS: "no_zlib=True,no_asm=True,shared=False"
+      }
     
 - job: Upload
   dependsOn:
@@ -128,6 +149,7 @@ jobs:
   - Windows
   - Linux
   - Macos
+  - Emscripten
   condition: and(succeeded(), in(variables['Build.Reason'], 'IndividualCI', 'BatchedCI'))
   pool:
     vmImage: "ubuntu-16.04"

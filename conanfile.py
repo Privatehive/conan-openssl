@@ -50,6 +50,8 @@ class OpenSSLConan(ConanFile):
             if tools.os_info.is_windows:
                 self.build_requires("msys2/20161025@tereius/stable")
             self.build_requires("android-ndk/r17b@tereius/stable")
+        if self.settings.os == 'Emscripten':
+            self.build_requires("emsdk_installer/1.38.29@bincrafters/stable")
 
     def source(self):
         self.output.info("Downloading %s" % self.source_tgz)
@@ -89,6 +91,8 @@ class OpenSSLConan(ConanFile):
             self.ios_build()
         elif self.compiler == "Visual Studio":
             self.visual_build()
+        elif self.settings.os == "Emscripten":
+            self.emscripten_build()
         else:
             raise Exception("Unsupported operating system: %s" % self.settings.os)
 
@@ -147,6 +151,8 @@ class OpenSSLConan(ConanFile):
         if self.settings.os == "Android":
             # see NOTES.ANDROID
             extra_flags += " -D__ANDROID_API__=%s" % str(self.settings.os.api_level)
+        if self.settings.os == "Emscripten":
+            extra_flags += " CROSS_COMPILE= -no-asm -D__STDC_NO_ATOMICS__=1"
 
         extra_flags += self._get_config_options_string()
         return extra_flags
@@ -312,6 +318,11 @@ class OpenSSLConan(ConanFile):
             self._patch_runtime()
             self.output.warn("----------MAKE OPENSSL %s-------------" % self.version)
             self.run_in_src("nmake build_libs")
+
+
+    def emscripten_build(self):
+        self.run_in_src("emconfigure ./Configure cc %s" % self._get_flags(), win_bash=tools.os_info.is_windows)
+        self.run_in_src("emmake make")
 
     def package(self):
         # Copy the license files
