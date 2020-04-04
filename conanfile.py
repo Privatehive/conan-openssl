@@ -37,7 +37,7 @@ class OpenSSLConan(ConanFile):
     default_options = "=False\n".join(options.keys()) + "=False"
 
     # When a new version is available they move the tar.gz to old/ location
-    source_tgz = "https://www.openssl.org/source/openssl-%s.tar.gz" % version
+    source_tgz = "https://github.com/openssl/openssl/archive/OpenSSL_%s.tar.gz" % version.replace(".", "_")
     source_tgz_old = "https://www.openssl.org/source/old/1.1.0/openssl-%s.tar.gz" % version
 
     def build_requirements(self):
@@ -55,13 +55,8 @@ class OpenSSLConan(ConanFile):
 
     def source(self):
         self.output.info("Downloading %s" % self.source_tgz)
-        try:
-            tools.download(self.source_tgz_old, "openssl.tar.gz")
-        except:
-            tools.download(self.source_tgz, "openssl.tar.gz")
+        tools.download(self.source_tgz, "openssl.tar.gz")
         tools.unzip("openssl.tar.gz")
-        tools.check_sha256("openssl.tar.gz",
-                           "5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b")
         os.unlink("openssl.tar.gz")
 
     def configure(self):
@@ -73,7 +68,7 @@ class OpenSSLConan(ConanFile):
 
     @property
     def subfolder(self):
-        return os.path.join(self.source_folder, "openssl-%s" % self.version)
+        return os.path.join(self.source_folder, "openssl-OpenSSL_%s" % self.version.replace(".", "_"))
 
     @property
     def arch(self):
