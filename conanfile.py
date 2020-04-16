@@ -12,6 +12,7 @@ class OpenSSLConan(ConanFile):
     license = "The current OpenSSL licence is an 'Apache style' license: https://www.openssl.org/source/license.html"
     description = "OpenSSL is an open source project that provides a robust, commercial-grade, and full-featured " \
                   "toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
+    exports_sources = ["dylibToFramework.sh"]
     # https://github.com/openssl/openssl/blob/OpenSSL_1_0_2l/INSTALL
     options = {"no_threads": [True, False],
                "no_zlib": [True, False],
@@ -349,6 +350,9 @@ class OpenSSLConan(ConanFile):
                 self.copy(pattern="*libssl.so*", dst="lib", keep_path=False, symlinks=True)
             else:
                 self.copy("*.a", "lib", keep_path=False)
+
+        if self.settings.os == "iOS" and self.settings.build_type == "Release":
+            self.run("%s/dylibToFramework.sh %s" % (self.source_folder, self.package_folder))
 
         self.copy(src=self.subfolder,
                   pattern="include/openssl/*.h",
