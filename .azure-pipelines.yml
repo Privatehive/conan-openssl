@@ -131,7 +131,7 @@ jobs:
       conanEnv: {
         CONAN_USERNAME: "tereius",
         CONAN_CHANNEL: "stable",
-        CONAN_REMOTES: "https://tereius.jfrog.io/artifactory/api/conan/public-conan,https://api.bintray.com/conan/bincrafters/public-conan",
+        CONAN_REMOTES: "https://tereius.jfrog.io/artifactory/api/conan/public-conan",
         CONAN_BASE_PROFILE_OS: "Emscripten",
         CONAN_BASE_PROFILE_ARCH: "asm.js",
         CONAN_BASE_PROFILE_OSBUILD: "Linux",

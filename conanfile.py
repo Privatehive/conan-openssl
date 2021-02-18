@@ -43,7 +43,7 @@ class OpenSSLConan(ConanFile):
 
     def build_requirements(self):
         if self.compiler == "Visual Studio":
-            self.build_requires("strawberryperl/5.26.0@conan/stable")
+            self.build_requires("strawberryperl/5.30.0.1")
             if not self.options.no_asm:
                 self.build_requires("nasm/2.13.01@conan/stable")
         if self.settings.os == 'Android':
