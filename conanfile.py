@@ -49,7 +49,7 @@ class OpenSSLConan(ConanFile):
         if self.settings.os == 'Android':
             self.build_requires_options['android-ndk'].makeStandalone = True
             if tools.os_info.is_windows:
-                self.build_requires("msys2/20161025@tereius/stable")
+                self.build_requires("msys2/20200517")
             self.build_requires("android-ndk/r17b@tereius/stable")
         if self.settings.os == 'Emscripten':
             self.build_requires("emsdk_installer/1.38.29@bincrafters/stable")
