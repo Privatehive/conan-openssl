@@ -1,0 +1,11 @@
+[settings]
+os=Linux
+arch=armv6
+compiler=gcc
+compiler.version=12
+compiler.libcxx=libstdc++11
+build_type=Release
+[options]
+raspberry-pi-os/*:os=buster
+[tool_requires]
+raspberry-pi-os/0.0.9@com.github.tereius/stable
