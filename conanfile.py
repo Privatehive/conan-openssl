@@ -468,7 +468,7 @@ class OpenSSLConan(ConanFile):
         shared_target = ""
         shlib_variant = ""
         if self.settings.os == "Android":
-            shlib_variant = 'shlib_variant => "_%s",' % self._android_abi
+            #shlib_variant = 'shlib_variant => "_%s",' % self._android_abi
             shared_extension = 'shared_extension => ".so",'
         if self.settings.os == "Neutrino":
             if self.options.shared:
