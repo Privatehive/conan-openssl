@@ -14,6 +14,7 @@ jobs:
     uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
       image: "ghcr.io/privatehive/conan-wine:latest"
+      conan_host_profile: "windowsMinGW"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_android_x86:
