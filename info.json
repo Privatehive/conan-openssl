@@ -1,0 +1,13 @@
+{
+  "version": "3.2.0",
+  "projectName": "openssl",
+  "projectDescription": "OpenSSL contains an open-source implementation of the SSL and TLS protocols.",
+  "vendor": "Björn Stresing",
+  "contact": "bjoern.stresing@gmx.de",
+  "domain": "de.privatehive",
+  "copyrightYear": "2024",
+  "repository": "https://github.com/Privatehive/conan-openssl",
+  "topics": ["openssl", "tls"],
+  "homepage": "https://openssl.org/",
+  "license": "Apache-2.0"
+}

@@ -10,20 +10,33 @@ from conan.tools.microsoft import is_msvc, msvc_runtime_flag, unix_path
 import fnmatch
 import os
 import textwrap
+import json
 
-required_conan_version = ">=1.57.0"
+required_conan_version = ">=2.0"
 
 
 class OpenSSLConan(ConanFile):
-    name = "openssl"
-    user = "com.github.tereius"
+
+    jsonInfo = json.load(open("info.json", 'r'))
+    # ---Package reference---
+    name = jsonInfo["projectName"]
+    version = jsonInfo["version"]
+    user = jsonInfo["domain"]
     channel = "stable"
-    version = "3.2.0"
-    url = "https://github.com/conan-io/conan-center-index"
-    homepage = "https://github.com/openssl/openssl"
-    license = "Apache-2.0"
-    topics = ("ssl", "tls", "encryption", "security")
-    description = "A toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols"
+    # ---Metadata---
+    description = jsonInfo["projectDescription"]
+    license = jsonInfo["license"]
+    author = jsonInfo["vendor"]
+    topics = jsonInfo["topics"]
+    homepage = jsonInfo["homepage"]
+    url = jsonInfo["repository"]
+    # ---Requirements---
+    requires = []
+    tool_requires = []
+    # ---Sources---
+    exports = ["info.json"]
+    exports_sources = []
+    # ---Binary model---
     package_type = "library"
     settings = "os", "arch", "compiler", "build_type"
     options = {
