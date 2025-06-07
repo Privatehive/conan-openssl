@@ -110,6 +110,8 @@ class OpenSSLConan(ConanFile):
     default_options["fPIC"] = True
     default_options["no_md2"] = True
     default_options["no_zlib"] = True
+    default_options["no_comp"] = True # SSL/TLS compression is unsecure - should be disabled by default
+    #default_options["no_autoload_config"] = True # Will load system wide openssl.cnf and may fail if versions/features are incompatible
     default_options["openssldir"] = None
     default_options["tls_security_level"] = None
 
