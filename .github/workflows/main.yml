@@ -6,6 +6,7 @@ jobs:
     name: "Linux"
     uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
+      name: "x86_64"
       image: "ubuntu-22.04"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
@@ -13,6 +14,7 @@ jobs:
     name: "Windows"
     uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
+      name: "x86_64"
       image: "windows-2022"
       conan_host_profile: "windowsMinGW"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
@@ -21,38 +23,43 @@ jobs:
     name: "Macos"
     uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
-      image: "macos-14"
+      name: "armv8"
+      image: "macos-15"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_android_x86:
     name: "Android"
-    uses: Privatehive/conan-workflows/.github/workflows/createPackageGcpRunner.yml@master
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
-      docker_image: "ghcr.io/privatehive/conan-ubuntu:latest"
+      name: "x86"
+      image: "ubuntu-22.04"
       conan_host_profile: "androidx86"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_android_x86_64:
     name: "Android"
-    uses: Privatehive/conan-workflows/.github/workflows/createPackageGcpRunner.yml@master
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
-      docker_image: "ghcr.io/privatehive/conan-ubuntu:latest"
+      name: "x86_64"
+      image: "ubuntu-22.04"
       conan_host_profile: "androidx86_64"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_android_armv7:
     name: "Android"
-    uses: Privatehive/conan-workflows/.github/workflows/createPackageGcpRunner.yml@master
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
-      docker_image: "ghcr.io/privatehive/conan-ubuntu:latest"
+      name: "armv7"
+      image: "ubuntu-22.04"
       conan_host_profile: "androidArmv7"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_android_armv8:
     name: "Android"
-    uses: Privatehive/conan-workflows/.github/workflows/createPackageGcpRunner.yml@master
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
-      docker_image: "ghcr.io/privatehive/conan-ubuntu:latest"
+      name: "armv8"
+      image: "ubuntu-22.04"
       conan_host_profile: "androidArmv8"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
