@@ -388,6 +388,9 @@ class OpenSSLConan(ConanFile):
 
         if self.settings.os == "Android":
             args.append(f" -D__ANDROID_API__={str(self.settings.os.api_level)}")  # see NOTES.ANDROID
+            if self.settings.arch == "armv8" or self.settings.arch == "x86_64":
+                args.append("-Wl,-z,max-page-size=16384")
+                args.append("-Wl,-z,common-page-size=16384")
         if self.settings.os == "Emscripten":
             args.append("-D__STDC_NO_ATOMICS__=1")
         if self.settings.os == "Windows":
