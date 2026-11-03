@@ -16,7 +16,8 @@ jobs:
     with:
       name: "x86_64"
       image: "windows-2022"
-      conan_host_profile: "windowsMinGW"
+      conan_host_profile: "windowsMinGW.host.profile"
+      conan_build_profile: "windowsMinGW.build.profile"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_macos_armv8:
@@ -27,13 +28,32 @@ jobs:
       image: "macos-15"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
+  build_linux_rpi_armv6:
+    name: "Linux (Raspberry Pi OS 32-bit)"
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
+    with:
+      name: "armv6"
+      image: "ubuntu-22.04"
+      conan_host_profile: "raspberrypiosArmv6.host.profile"
+      conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
+
+  build_linux_rpi_armv8:
+    name: "Linux (Raspberry Pi OS 64-bit)"
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
+    with:
+      name: "armv8"
+      image: "ubuntu-22.04"
+      conan_host_profile: "raspberrypiosArmv8.host.profile"
+      conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
+
   build_android_x86:
     name: "Android"
     uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
       name: "x86"
       image: "ubuntu-22.04"
-      conan_host_profile: "androidx86"
+      conan_host_profile: "androidx86.host.profile"
+      conan_build_profile: "android.build.profile"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_android_x86_64:
@@ -42,7 +62,8 @@ jobs:
     with:
       name: "x86_64"
       image: "ubuntu-22.04"
-      conan_host_profile: "androidx86_64"
+      conan_host_profile: "androidx86_64.host.profile"
+      conan_build_profile: "android.build.profile"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_android_armv7:
@@ -51,7 +72,8 @@ jobs:
     with:
       name: "armv7"
       image: "ubuntu-22.04"
-      conan_host_profile: "androidArmv7"
+      conan_host_profile: "androidArmv7.host.profile"
+      conan_build_profile: "android.build.profile"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   build_android_armv8:
@@ -60,7 +82,8 @@ jobs:
     with:
       name: "armv8"
       image: "ubuntu-22.04"
-      conan_host_profile: "androidArmv8"
+      conan_host_profile: "androidArmv8.host.profile"
+      conan_build_profile: "android.build.profile"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
 
   upload_recipe:
