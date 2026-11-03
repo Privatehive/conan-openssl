@@ -440,6 +440,8 @@ class OpenSSLConan(ConanFile):
     def generate(self):
         tc = AutotoolsToolchain(self)
         env = tc.environment()
+        if is_apple_os(self):
+            tc.extra_ldflags.append("-Wl,-headerpad_max_install_names")
         env.define_path("PERL", self._perl)
         if self.settings.compiler == "apple-clang":
             xcrun = XCRun(self)
